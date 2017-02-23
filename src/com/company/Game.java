@@ -1,5 +1,6 @@
 package com.company;
 
+import java.util.Arrays;
 import java.util.Random;
 
 
@@ -8,6 +9,8 @@ import java.util.Random;
  */
 public class Game implements Cloneable {
 
+
+    public static final String HUMAN_FIRST = "NONE";
     private static final String BLANK = " ";
     private static final String X_LETTER = "X";
     private static final String O_LETTER = "O";
@@ -46,12 +49,16 @@ public class Game implements Cloneable {
     }
 
     public boolean playMove(int x, int y) {
-        if (board[x][y].equals(BLANK)) {
+        if (isValidMove(x, y)) {
             board[x][y] = currentSymbol;
             switchCurrentPlayer();
             return true;
         }
         return false;
+    }
+
+    public boolean isValidMove(int x, int y) {
+        return board[x][y].equals(BLANK);
     }
 
     private void switchCurrentPlayer() {
@@ -117,5 +124,12 @@ public class Game implements Cloneable {
             }
         }
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "board=" + Arrays.toString(board) +
+                '}';
     }
 }
