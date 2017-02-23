@@ -12,6 +12,7 @@ public class Game implements Cloneable {
     private static final String X_LETTER = "X";
     private static final String O_LETTER = "O";
     private String[][] board = new String[3][3];
+
     private Player currentPlayer;
     private String currentSymbol = X_LETTER;
     private Random random;
@@ -117,5 +118,9 @@ public class Game implements Cloneable {
             }
         }
         return true;
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
     }
 }
