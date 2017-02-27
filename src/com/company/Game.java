@@ -10,16 +10,6 @@ import java.util.Random;
 public class Game implements Cloneable {
 
 
-    public static final String HUMAN_FIRST = "NONE";
-    private static final String BLANK = " ";
-    private static final String X_LETTER = "X";
-    private static final String O_LETTER = "O";
-    private String[][] board = new String[3][3];
-
-    private Player currentPlayer;
-    private String currentSymbol = X_LETTER;
-    private Random random;
-
     enum Player {
         HUMAN,
         CPU
@@ -30,6 +20,17 @@ public class Game implements Cloneable {
         DRAW,
         WIN
     }
+
+    public static final String HUMAN_FIRST = "NONE";
+    private static final String BLANK = " ";
+    private static final String X_LETTER = "X";
+    private static final String O_LETTER = "O";
+    private String[][] board = new String[3][3];
+
+    private Player currentPlayer;
+    private String currentSymbol = X_LETTER;
+    private Random random;
+
 
     public Game(Player currentPlayer) {
         random = new Random();
@@ -127,15 +128,14 @@ public class Game implements Cloneable {
         return true;
     }
 
-<<<<<<< HEAD
     @Override
     public String toString() {
         return "Game{" +
                 "board=" + Arrays.toString(board) +
                 '}';
-=======
+    }
+
     public Player getCurrentPlayer() {
         return currentPlayer;
->>>>>>> a07b0138dce5fe47db1073afc7a0a7e30714e185
     }
 }
