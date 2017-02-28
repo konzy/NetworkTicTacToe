@@ -5,7 +5,7 @@ import java.util.Random;
 
 
 /**
- * Created by konzy on 2/21/2017.
+ * Brian Konzman and Daniel Slone
  */
 public class Game implements Cloneable {
 
@@ -23,14 +23,12 @@ public class Game implements Cloneable {
 
     public static final String HUMAN_FIRST = "NONE";
     private static final String BLANK = " ";
-    private static final String X_LETTER = "X";
-    private static final String O_LETTER = "O";
+    private static final String SERVER_LETTER = "X";
+    private static final String CLIENT_LETTER = "O";
+
     private String[][] board = new String[3][3];
-
     private Player currentPlayer;
-    private String currentSymbol = X_LETTER;
     private Random random;
-
 
     public Game(Player currentPlayer) {
         random = new Random();
@@ -38,17 +36,17 @@ public class Game implements Cloneable {
         this.currentPlayer = currentPlayer;
     }
 
-    public Game() {
-        random = new Random();
-        initializeBoard();
-        getRandomCurrentPlayer();
-    }
-
     @Override
     public Object clone() {
         try {
             Game clone = (Game)super.clone();
-            clone.board = board.clone();
+            String[][] cloneBoard = new String[3][3];
+            for (int y = 0; y < 3; y++) {
+                for (int x = 0; x < 3; x++) {
+                    cloneBoard[x][y] = board[x][y];
+                }
+            }
+            clone.board = cloneBoard;
             return clone;
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
@@ -58,11 +56,18 @@ public class Game implements Cloneable {
 
     public boolean playMove(int x, int y) {
         if (isValidMove(x, y)) {
-            board[x][y] = currentSymbol;
+            board[x][y] = getCurrentSymbol();
             switchCurrentPlayer();
             return true;
         }
         return false;
+    }
+
+    public String getCurrentSymbol() {
+        if (currentPlayer == Player.HUMAN) {
+            return CLIENT_LETTER;
+        }
+        return SERVER_LETTER;
     }
 
     public boolean playMove(Move move) {
@@ -104,17 +109,10 @@ public class Game implements Cloneable {
         } else {
             currentPlayer = Player.HUMAN;
         }
-
-        if (currentSymbol.equals(X_LETTER)) {
-            currentSymbol = O_LETTER;
-        } else {
-            currentSymbol = X_LETTER;
-        }
     }
 
     private void getRandomCurrentPlayer() {
         currentPlayer = Player.HUMAN;
-
         if (random.nextInt(2) == 0) {
             currentPlayer = Player.CPU;
         }
@@ -167,11 +165,10 @@ public class Game implements Cloneable {
     public String toString() {
         String s = "";
         String bar = "|";
-        s += "---------" + "\n";
-        s += bar + board[0][0] + bar + board[1][0] + bar + board[2][0] + bar + "\n";
-        s += bar + board[0][1] + bar + board[1][1] + bar + board[2][1] + bar + "\n";
-        s += bar + board[0][2] + bar + board[1][2] + bar + board[2][2] + bar + "\n";
-        s += "---------" + "\n";
+        s += "  0 1 2 \n";
+        s += "0" + bar + board[0][0] + bar + board[1][0] + bar + board[2][0] + bar + "\n";
+        s += "1" + bar + board[0][1] + bar + board[1][1] + bar + board[2][1] + bar + "\n";
+        s += "2" + bar + board[0][2] + bar + board[1][2] + bar + board[2][2] + bar + "\n";
         return s;
     }
 

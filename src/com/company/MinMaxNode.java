@@ -1,22 +1,22 @@
 package com.company;
 
-import static com.company.Game.Player.HUMAN;
+import java.util.ArrayList;
+
 
 /**
- * Created by slonej3 on 2/23/17.
+ * Brian Konzman and Daniel Slone
  */
 public class MinMaxNode {
     private Game gameBoard;
-    private MinMaxNode root;
-    private int move;
+    private Move move;
     private int value = 0;
+    private ArrayList<MinMaxNode> possibleMoves = new ArrayList<>();
 
-    public MinMaxNode(Game gameBoard, MinMaxNode root, int move) {
+    public MinMaxNode(Game gameBoard, Move move) {
         this.gameBoard = gameBoard;
-        this.root = root;
         this.move = move;
 
-        if (gameBoard.getCurrentPlayer() == HUMAN) {
+        if (gameBoard.getCurrentPlayer() == Game.Player.HUMAN) {
             value = 1000;
         } else {
             value = -1000;
@@ -27,45 +27,53 @@ public class MinMaxNode {
 
     public MinMaxNode(Game gameBoard) {
         this.gameBoard = gameBoard;
+        createTree(gameBoard);
     }
 
     public void createTree(Game gameBoard) {
+        //Tree creation
+        if (gameBoard.getGameState() == Game.GameState.PLAY) {
+            ArrayList<Move> moves = gameBoard.validMoves();
 
+            for (Move move : moves) {
+                Game tempGame = (Game)gameBoard.clone();
+                tempGame.playMove(move);
+                MinMaxNode node = new MinMaxNode(tempGame, move);
+                possibleMoves.add(node);
+            }
+            if (gameBoard.getCurrentPlayer() == Game.Player.CPU) {
+                for (MinMaxNode possibleMove : possibleMoves) {
+                    value = Math.max(possibleMove.value - 1, value);
+                }
+            } else {
+                for (MinMaxNode possibleMove : possibleMoves) {
+                    value = Math.min(possibleMove.value + 1, value);
+                }
+            }
+        } else { // WIN, LOSE, or DRAW -- we are at the leaf node
+            if (gameBoard.getGameState() == Game.GameState.TIE) {
+                value = 0;
+            } else if (gameBoard.getGameState() == Game.GameState.WIN && gameBoard.getCurrentPlayer() == Game.Player.CPU) {
+                value = -10;
+            } else if (gameBoard.getGameState() == Game.GameState.WIN && gameBoard.getCurrentPlayer() == Game.Player.HUMAN) {
+                value = 10;
+            }
+        }
     }
 
-    public int bestMove() {
-        return -1;
+    public Move bestMove() {
+        if (gameBoard.validMoves().size() == 9) {//if first move
+            return gameBoard.getRandomValidMove();
+        }
+
+        Move result = null;
+        int bestValue = -1000;
+        for (MinMaxNode possibleMove : possibleMoves) {
+            if (possibleMove.value > bestValue) {
+                result = possibleMove.move;
+                bestValue = possibleMove.value;
+            }
+        }
+        return result;
     }
-
-
-    /* ---- GETTERS & SETTERS ---- */
-
-    public Game getGameBoard() {
-        return gameBoard;
-    }
-
-    public void setGameBoard(Game gameBoard) {
-        this.gameBoard = gameBoard;
-    }
-
-    public MinMaxNode getRoot() {
-        return root;
-    }
-
-    public void setRoot(MinMaxNode root) {
-        this.root = root;
-    }
-
-    public int getMove() {
-        return move;
-    }
-
-    public void setMove(int move) {
-        this.move = move;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
 }

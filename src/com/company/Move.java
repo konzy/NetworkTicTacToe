@@ -1,7 +1,7 @@
 package com.company;
 
 /**
- * Created by konzy on 2/23/2017.
+ * Brian Konzman and Daniel Slone
  */
 public class Move {
 

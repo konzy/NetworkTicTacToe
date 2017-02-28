@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.util.Random;
 
 /**
- * Created by konzy on 2/27/2017.
+ * Brian Konzman and Daniel Slone
  */
 public class Server {
 
@@ -47,7 +47,8 @@ public class Server {
                         out.println(CLIENT_TIE_MESSAGE);
                     }
                 } else {//cpu
-                    Move cpuMove = game.getRandomValidMove();
+                    MinMaxNode minMaxAI = new MinMaxNode(game);
+                    Move cpuMove = minMaxAI.bestMove();
                     game.playMove(cpuMove);
                     String moveString = "MOVE " + cpuMove.toString();
                     if (game.getGameState() == Game.GameState.WIN) {
