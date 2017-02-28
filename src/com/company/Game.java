@@ -1,6 +1,6 @@
 package com.company;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -9,7 +9,6 @@ import java.util.Random;
  */
 public class Game implements Cloneable {
 
-
     enum Player {
         HUMAN,
         CPU
@@ -17,8 +16,9 @@ public class Game implements Cloneable {
 
     enum GameState {
         PLAY,
-        DRAW,
-        WIN
+        TIE,
+        WIN,
+        LOSS
     }
 
     public static final String HUMAN_FIRST = "NONE";
@@ -33,6 +33,12 @@ public class Game implements Cloneable {
 
 
     public Game(Player currentPlayer) {
+        random = new Random();
+        initializeBoard();
+        this.currentPlayer = currentPlayer;
+    }
+
+    public Game() {
         random = new Random();
         initializeBoard();
         getRandomCurrentPlayer();
@@ -59,8 +65,37 @@ public class Game implements Cloneable {
         return false;
     }
 
+    public boolean playMove(Move move) {
+        return playMove(move.x, move.y);
+    }
+
     public boolean isValidMove(int x, int y) {
         return board[x][y].equals(BLANK);
+    }
+
+    public boolean isValidMove(Move m) {
+        return isValidMove(m.x, m.y);
+    }
+
+    public ArrayList<Move> validMoves() {
+        ArrayList<Move> moves = new ArrayList<>();
+        if (isWin()) {
+            return moves;
+        }
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {
+                Move move = new Move(x, y);
+                if (isValidMove(move)) {
+                    moves.add(move);
+                }
+            }
+        }
+        return moves;
+    }
+
+    public Move getRandomValidMove() {
+        ArrayList<Move> moves = validMoves();
+        return moves.get(random.nextInt(moves.size()));
     }
 
     private void switchCurrentPlayer() {
@@ -94,11 +129,11 @@ public class Game implements Cloneable {
         }
     }
 
-    private GameState getGamestate() {
+    public GameState getGameState() {
         if (isWin()) {
             return GameState.WIN;
         } else if (isBoardFull()) {
-            return GameState.DRAW;
+            return GameState.TIE;
         }
         return GameState.PLAY;
     }
@@ -130,9 +165,14 @@ public class Game implements Cloneable {
 
     @Override
     public String toString() {
-        return "Game{" +
-                "board=" + Arrays.toString(board) +
-                '}';
+        String s = "";
+        String bar = "|";
+        s += "---------" + "\n";
+        s += bar + board[0][0] + bar + board[1][0] + bar + board[2][0] + bar + "\n";
+        s += bar + board[0][1] + bar + board[1][1] + bar + board[2][1] + bar + "\n";
+        s += bar + board[0][2] + bar + board[1][2] + bar + board[2][2] + bar + "\n";
+        s += "---------" + "\n";
+        return s;
     }
 
     public Player getCurrentPlayer() {

@@ -8,64 +8,71 @@ import java.net.Socket;
  */
 public class Client {
 
-    public static final int PORT = 7788;
+
     private static final String EXIT = "exit";
     private static final String VALID_INPUT = "[012] [012]|" + EXIT;
     private static final String WELCOME = "Welcome to the game of TicTacToe";
+    private static final String IN_QUEUE = "You are in queue to play with the server";
+    private static final String CONNECTED = "You are connected to the server";
 
-    public static void main(String[] args) {
-        try {
-            System.out.println(WELCOME);
-            Socket ticTacToeSocket = new Socket("localhost", 7788);
-            PrintWriter out = new PrintWriter(ticTacToeSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(ticTacToeSocket.getInputStream()));
-            BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+    public static void main(String[] args) throws IOException {
+        System.out.println(WELCOME);
+        System.out.println(IN_QUEUE);
+        Socket ticTacToeSocket = new Socket("127.0.0.1", Server.PORT);
+        PrintWriter out = new PrintWriter(ticTacToeSocket.getOutputStream(), true);
+        BufferedReader in = new BufferedReader(new InputStreamReader(ticTacToeSocket.getInputStream()));
+        BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+        String response = in.readLine();
 
-            String response = in.readLine();
+        System.out.println(CONNECTED);
 
+        Game game;
+        if (response.equals(Game.HUMAN_FIRST)) {
+            game = new Game(Game.Player.HUMAN);
+        } else {
+            game = new Game(Game.Player.CPU);
+            parseResponse(response, game);
+        }
 
-            Game game;
-            if (response.equals(Game.HUMAN_FIRST)) {
-                game = new Game(Game.Player.HUMAN);
-            } else {
-                game = new Game(Game.Player.CPU);
-            }
+        System.out.println(game.toString());
 
-            String input;
+        String input;
 
-            while ((input = stdIn.readLine()) != null) {
-                if (input.equals(EXIT)) {
-                    System.exit(0);
-                } else if (input.matches(VALID_INPUT)) {
-                    int x = Integer.valueOf(input.substring(0, 1));
-                    int y = Integer.valueOf(input.substring(2, 3));
-                    if (game.isValidMove(x, y)) {
-                        out.println("MOVE " + input);
-                        game.playMove(x, y);
-                        response = in.readLine();
-                        parseResponse(response, game);
-                    }
+        while ((input = stdIn.readLine()) != null) {
+            if (input.equals(EXIT)) {
+                System.exit(0);
+            } else if (input.matches(VALID_INPUT)) {
+                Move move = new Move(input);
+                if (game.isValidMove(move)) {
+                    out.println("MOVE " + input);
+                    game.playMove(move);
+                    System.out.println(game.toString());
+                    response = in.readLine();
+                    parseResponse(response, game);
+                    System.out.println(game.toString());
                 }
             }
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
     private static Game.GameState parseResponse(String response, Game game) {
+        String s = response.substring(5, 8);
+        game.playMove(new Move(s));
         if (response.length() < 9) {
-            //normal move
-            game.playMove(response.charAt(6), response.charAt(8));
             return Game.GameState.PLAY;
         } else {
-            //handle move 0 0 win
-            //handle move 0 0 tie
-            //handle move * * loss
-            //handle move * * tie
-        }
-        return Game.GameState.DRAW;
-    }
+            String gameOverMessage = response.substring(9).trim().toLowerCase();
+            System.out.println(game.toString());
+            if (gameOverMessage.equals(Game.GameState.TIE.name().toLowerCase())) {
+                System.out.println("Tie Game, Try again");
+            } else if (gameOverMessage.equals(Game.GameState.WIN.name().toLowerCase())) {
+                System.out.println("You Win!");
+            } else if (gameOverMessage.equals(Game.GameState.LOSS.name().toLowerCase())) {
 
+                System.out.println("You Lose, good day Sir, you get NOTHING!");
+            }
+            System.exit(0);
+        }
+        return Game.GameState.TIE;
+    }
 }
