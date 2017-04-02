@@ -7,6 +7,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Random;
 
+/**
+ * Brian Konzman and Daniel Slone
+ */
 public class MultiServerThread extends Thread {
 
     Socket socket;
